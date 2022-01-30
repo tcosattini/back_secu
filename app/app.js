@@ -22,14 +22,14 @@ app.use(cors());
 // AUTH SignIn
 
 dbConfig.connexion();
-dbConfig.createUser("toto1", "t.cosattini@gmail.com", "toto1");
+dbConfig.createUser("toto", "t.cosattini@gmail.com", "toto");
 
 //AUTH Find if user has a granted access trough the directory
 app.post("/api/check", cors(), jsonParser, (req, res) => {
   console.log("Directory requested");
   var userName = req.body.username;
   var ad = new ActiveDirectory(config);
-  ad.findOne(userName, function (err, user) {
+  ad.findUser(userName, function (err, user) {
     if (err) {
       console.log("ERROR: " + JSON.stringify(err));
       return res.status(500).json({
