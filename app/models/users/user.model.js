@@ -7,7 +7,7 @@ const User = mongoose.model(
     email: String,
     password: String,
     browser: String,
-    ip: Number,
+    ip: String,
   })
 );
 
