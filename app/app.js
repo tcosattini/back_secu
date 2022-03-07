@@ -49,14 +49,31 @@ app.post("/api/check", cors(), jsonParser, (req, res) => {
     }
 
     if (auth) {
+      //
       console.log("AD access for  =>  " + userName);
-      console.log(
-        userController.checkIp(userName, requestIp, browserName, req, res)
-      );
+      console.log();
       console.log("Browser: " + browserName);
-      // return res.status(200).json({
-      //   message: "User" + userName + "found ! ",
-      // });
+      console.log("res: " + res);
+
+      ad.findUser(userName, function (err, user) {
+        if (err) {
+          console.log("ERROR: " + JSON.stringify(err));
+          return;
+        }
+
+        if (!user) console.log("User: " + sAMAccountName + " not found.");
+        else
+          console.log(
+            userController.checkIp(
+              userName,
+              requestIp,
+              browserName,
+              req,
+              res,
+              user
+            )
+          );
+      });
     }
   });
 });

@@ -32,7 +32,7 @@ exports.signin = (req, res) => {
   });
 };
 
-exports.checkIp = (username, requestIp, browserName, req, res) => {
+exports.checkIp = (username, requestIp, browserName, req, res, email) => {
   // 1 : Find User
   // 2 : If user found => check IP request with DB IP
   // 3 : If IP request != IP DB => Check IP origin ;  else => OK 200
@@ -47,14 +47,16 @@ exports.checkIp = (username, requestIp, browserName, req, res) => {
     console.log(user.browser, browserName);
 
     if (user.browser !== browserName) {
-      return res.status(403).json({
+      return res.status(210).json({
         message: "Navigateur non habituel",
+        email: user.mail,
       });
     }
 
     // Compare if the DB IP is != request IP
     if (user.ip !== requestIp) {
       console.log(
+        "\x1b[33m",
         "WARNING  " +
           user.username +
           "  is trying to connect with a new IP =>  " +
@@ -68,12 +70,15 @@ exports.checkIp = (username, requestIp, browserName, req, res) => {
           message: "Connexion impossible depuis cette zone Géographique",
         });
       } // send EMAIL
-      return res.status(201).json({
-        message: "Ok mais vérif e-mail",
+      return res.status(210).json({
+        message: "Login success",
+        userName: user.username,
+        mail: email.mail,
+        ip: user.ip,
       });
     }
     return res.status(200).json({
-      message: "Ok mais vérif e-mail",
+      message: "Ok",
     });
   });
 };
