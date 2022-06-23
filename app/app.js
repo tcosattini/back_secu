@@ -25,11 +25,11 @@ var config = {
   password: "Azerty-77",
 };
 app.use(cors(), expressip().getIpInfoMiddleware);
-app.listen(8080);
+// app.listen(8080);
 
-// var httpsServer = https.createServer(credentials, app);
+var httpsServer = https.createServer(credentials, app);
 
-// httpsServer.listen(8080);
+httpsServer.listen(8080);
 
 dbConfig.connexion();
 const limiter = rateLimit({

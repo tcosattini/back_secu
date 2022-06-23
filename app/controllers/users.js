@@ -37,6 +37,7 @@ const getUserDB = (username, browserName, req, res, email) => {
     console.log(user.browser, browserName);
 
     if (user.browser !== browserName) {
+      console.log(user.ip);
       return res.status(210).json({
         message: "Navigateur non habituel",
         user: user.username,
