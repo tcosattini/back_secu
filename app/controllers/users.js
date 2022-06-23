@@ -1,5 +1,6 @@
 const User = require("../models/users/user.model");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 
 exports.signin = (req, res) => {
   User.findOne({
@@ -29,25 +30,45 @@ exports.signin = (req, res) => {
   });
 };
 
-exports.getUserDB = (username, browserName, req, res, email) => {
-  console.log(email);
+const getUserDB = (username, browserName, req, res, email) => {
   User.findOne({
     username: username,
   }).exec((err, user) => {
+    console.log(user.browser, browserName);
+
     if (user.browser !== browserName) {
       return res.status(210).json({
         message: "Navigateur non habituel",
         user: user.username,
-        mail: email,
+        mail: email.mail,
         ip: user.ip,
       });
     }
 
     return res.status(200).json({
       message: "Login success",
-      user: user,
-      mail: email,
+      user: user.username,
+      mail: email.mail,
       ip: user.ip,
     });
   });
 };
+const createUser = (username, email, password) => {
+  mongoose;
+  User.estimatedDocumentCount((err, count) => {
+    if (!err) {
+      new User({
+        username: username,
+        email: email,
+        password: bcrypt.hashSync(password, 8),
+      }).save((err) => {
+        if (err) {
+          console.log("error", err);
+        }
+        console.log("new user added");
+      });
+    }
+  });
+};
+
+module.exports = { createUser, getUserDB };

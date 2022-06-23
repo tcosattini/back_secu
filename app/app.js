@@ -1,7 +1,5 @@
 const express = require("express");
 var cors = require("cors");
-const app = express();
-const port = 8000;
 var bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
 var ActiveDirectory = require("activedirectory");
@@ -10,19 +8,28 @@ const userController = require("../app/controllers/user.controler");
 var UAParser = require("ua-parser-js");
 const expressip = require("express-ip");
 const rateLimit = require("express-rate-limit");
+const https = require("https");
+const http = require("http");
+const fs = require("fs");
+var app = express();
 
-var config = {
-  url: "ldap://104.40.137.0:389",
-  baseDN: "dc=b3sysops,dc=lan",
-  username: "Admin_Clement@b3sysops.lan",
-  password: "K#W?'+Y/0!EmSM+'r`8M",
+const credentials = {
+  key: fs.readFileSync("./certificat/privateKey.key"),
+  cert: fs.readFileSync("./certificat/certificate.crt"),
 };
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+var config = {
+  url: "ldap://15.237.122.218:389",
+  baseDN: "dc=epsidev, dc=lan",
+  username: "Charly",
+  password: "Azerty-77",
+};
 app.use(cors(), expressip().getIpInfoMiddleware);
-// AUTH SignIn
+app.listen(8080);
+
+// var httpsServer = https.createServer(credentials, app);
+
+// httpsServer.listen(8080);
 
 dbConfig.connexion();
 const limiter = rateLimit({
@@ -37,7 +44,7 @@ app.use(limiter);
 // dbConfig.createUser("clement.sergent", "clement.sergent@epsi.fr", "clement");
 
 //AUTH Find if user has a granted access trough the directory
-app.post("/api/check", cors(), jsonParser, (req, res) => {
+app.post("/api/check", jsonParser, (req, res) => {
   console.log("Directory requested");
   var userName = req.body.username;
   var password = req.body.password;
@@ -45,15 +52,18 @@ app.post("/api/check", cors(), jsonParser, (req, res) => {
   var ua = req.headers["user-agent"];
   var browserName = parser.setUA(ua).getBrowser().name;
   var ad = new ActiveDirectory(config);
+  var query = "cn=*" + userName + "*";
 
   ad.authenticate(userName, password, function (err, auth, username) {
     if (auth) {
-      ad.findUser(userName, function (err, user) {
-        if (!user) console.log("User not found in DB");
+      ad.findUsers(query, function (err, user) {
+        console.log(user[0].mail);
+
+        if (!user) console.log("User not found in AD");
         if (err) {
           console.log("ERROR: " + JSON.stringify(err));
           return err;
-        } else userController.getUserDB(userName, browserName, req, res, user);
+        } else console.log(user[0]), userController.getUserDB(userName, browserName, req, res, user[0].mail);
       });
     }
     if (!auth) {
