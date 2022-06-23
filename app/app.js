@@ -13,10 +13,19 @@ const http = require("http");
 const fs = require("fs");
 var app = express();
 
-const credentials = {
-  key: fs.readFileSync("./certificat/privateKey.key"),
-  cert: fs.readFileSync("./certificat/certificate.crt"),
-};
+// little change to deploy on the docker container
+var credentials={};
+if (!process.env.ENV_MSPR){
+  credentials = {
+    key: fs.readFileSync("./certificat/privateKey.key"),
+    cert: fs.readFileSync("./certificat/certificate.crt"),
+  };
+}else{
+  credentials = {
+    key: fs.readFileSync("app/certificat/privateKey.key"),
+    cert: fs.readFileSync("app/certificat/certificate.crt"),
+  };
+}
 
 var config = {
   url: "ldap://15.237.122.218:389",
